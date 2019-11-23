@@ -4,6 +4,7 @@ package com.aiven.metrics.metrics;
 import com.aiven.metrics.kafka.MetricsRetryProducer;
 import com.aiven.metrics.model.Metrics;
 import com.aiven.metrics.model.MetricsRetry;
+import com.aiven.metrics.systems.KafkaTemplateSystem;
 import com.aiven.metrics.systems.MetricsSystem;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Assertions;
@@ -28,14 +29,21 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class MetricsAddTest {
-
+    /*
+    test adding metrics through a rest point. the test will cover the rest point call and the submit to kafka topic
+    test will not cover consuming the topic.
+     */
     @Test
     public void testAddMetrics() {
-        KafkaTemplate<String, Metrics> kafkaTemplate = createKafkaTemplate();
+        //initialize test
+        KafkaTemplate<String, Metrics> kafkaTemplate = KafkaTemplateSystem.createMetricKafkaTemplate();
         MetricsSystem metricsSystem = MetricsSystem.create(kafkaTemplate, null);
 
+        //run test
         Long machineId = 10L;
         ResponseEntity<Metrics> response = metricsSystem.addMetrics(createMetrics(machineId));
+
+        //validate
         Metrics metrics = response.getBody();
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
         Assertions.assertEquals(machineId, metrics.getMachineId());
@@ -43,10 +51,14 @@ public class MetricsAddTest {
 
     @Test
     public void testAddInvalidMetrics() {
+        //initialize test
         MetricsSystem metricsSystem = MetricsSystem.create(null, null);
 
+        //run test
         Long machineId = null;
         ResponseEntity<Metrics> response = metricsSystem.addMetrics(createMetrics(machineId));
+
+        //validate
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
