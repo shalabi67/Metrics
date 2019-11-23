@@ -31,11 +31,11 @@ public class KafkaTemplateSystem<KEY, VALUE> {
         KafkaTemplateSystem<String, Metrics> kafkaTemplateSystem = new KafkaTemplateSystem<>();
         return kafkaTemplateSystem.createKafkaTemplate(kafkaTemplateSystem.defaultKafkaSend);
     }
-    /*
+
     public static KafkaTemplate<String, Metrics> createThrowingMetricKafkaTemplate() {
         KafkaTemplateSystem<String, Metrics> kafkaTemplateSystem = new KafkaTemplateSystem<>();
         return kafkaTemplateSystem.createKafkaTemplate(invocationOnMock -> {throw new InterruptedException();});
-    }*/
+    }
 
     public static KafkaTemplate<String, MetricsRetry> createMetricRetryKafkaTemplate() {
         KafkaTemplateSystem<String, MetricsRetry> kafkaTemplateSystem = new KafkaTemplateSystem<>();
@@ -43,7 +43,7 @@ public class KafkaTemplateSystem<KEY, VALUE> {
     }
 
     public KafkaTemplate<KEY, VALUE> createKafkaTemplate(
-            Function<InvocationOnMock, ListenableFuture<SendResult<KEY, VALUE>>> function) {
+            ThrowableFunction<KEY, VALUE> function) {
         KafkaTemplate<KEY, VALUE> kafkaTemplate = (KafkaTemplate<KEY, VALUE>) Mockito.mock(KafkaTemplate.class);
         if(kafkaTemplate == null) {
             Assertions.fail();
@@ -60,7 +60,7 @@ public class KafkaTemplateSystem<KEY, VALUE> {
         return kafkaTemplate;
     }
 
-    private Function<InvocationOnMock, ListenableFuture<SendResult<KEY, VALUE>>> defaultKafkaSend = (invocationOnMock -> {
+    private ThrowableFunction<KEY, VALUE> defaultKafkaSend = (invocationOnMock -> {
         VALUE metrics = invocationOnMock.getArgument(1);
         String topic = invocationOnMock.getArgument(0);
         SettableListenableFuture<SendResult<KEY, VALUE>> future = new SettableListenableFuture<>();
