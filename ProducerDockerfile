@@ -1,0 +1,14 @@
+# build producer
+FROM openjdk:8-jdk-alpine
+WORKDIR /build
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
+RUN ./mvnw package -DskipTests
+
+# application container
+FROM openjdk:8-jre-alpine
+COPY target/*.jar producer.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","producer.jar"]

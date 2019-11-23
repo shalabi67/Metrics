@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  producer:
+    build:
+      context: ./
+      dockerfile: ProducerDockerfile
+    image: metrics-producer
+    ports:
+      - 8080
+    depends_on:
+      - kafka
+      - postgres
+    links:
+      - kafka
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/postgres
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: kafka:9092
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: kafka:9092
+
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    restart: always
+    ports:
+      - 2181:2181
+
+  kafka:
+    image: wurstmeister/kafka
+    restart: always
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper:zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper
+      KAFKA_CREATE_TOPICS: "Metrics:1:1"
+
+  postgres:
+    image: postgres:9.6
+    ports:
+      - 5432:5432
