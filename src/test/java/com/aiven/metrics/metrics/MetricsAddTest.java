@@ -15,13 +15,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-
+/*
+test adding metrics through a rest point. the test will cover the rest point call and the submit to kafka topic
+test will not cover consuming the topic.
+*/
 @ExtendWith(MockitoExtension.class)
 public class MetricsAddTest {
-    /*
-    test adding metrics through a rest point. the test will cover the rest point call and the submit to kafka topic
-    test will not cover consuming the topic.
-     */
+
     @Test
     public void testAddMetrics() {
         //initialize test

@@ -11,7 +11,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 public class MetricsSystem {
     private MetricsController metricsController;
-    public static MetricsSystem create(KafkaTemplate<String, Metrics> kafkaTemplate, KafkaTemplate<String, MetricsRetry> kafkaRetryTemplate) {
+    public static MetricsSystem create(
+            KafkaTemplate<String, Metrics> kafkaTemplate,
+            KafkaTemplate<String, MetricsRetry> kafkaRetryTemplate) {
         MetricsSystem metricsSystem = new MetricsSystem();
 
         MetricsService metricsService = metricsSystem.createMetricsService(kafkaTemplate, kafkaRetryTemplate);
@@ -23,7 +25,9 @@ public class MetricsSystem {
         return metricsController.addMetrics(metrics);
     }
 
-    private MetricsService createMetricsService(KafkaTemplate<String, Metrics> kafkaTemplate, KafkaTemplate<String, MetricsRetry> kafkaRetryTemplate) {
+    private MetricsService createMetricsService(
+            KafkaTemplate<String, Metrics> kafkaTemplate,
+            KafkaTemplate<String, MetricsRetry> kafkaRetryTemplate) {
         MetricsRetryProducer metricsRetryProducer = new MetricsRetryProducer(kafkaRetryTemplate);
         MetricsProducer metricsProducer = new MetricsProducer(kafkaTemplate, metricsRetryProducer);
 
