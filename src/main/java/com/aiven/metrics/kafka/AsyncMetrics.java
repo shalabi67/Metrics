@@ -102,11 +102,13 @@ public class AsyncMetrics {
             log.error(e.getMessage());
 
             if(metricsRetry.getRetryCount() < consumerConfiguration.getRetryCount()) {
-                //increment retry count and rery the operation.
+                //increment retry count and retry the operation.
                 newMetricsRetry = new MetricsRetry(
-            metricsRetry.getRetryCount() +1,
+            metricsRetry.getRetryCount() + 1,
                       metricsRetry.getMetrics());
                 metricsRetryProducer.sendMetrics(newMetricsRetry);
+            } else {
+                //TODO: what we should do. is it ok to discard the message?
             }
         }
         return CompletableFuture.completedFuture(newMetricsRetry);

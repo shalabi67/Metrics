@@ -12,6 +12,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.SettableListenableFuture;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +28,8 @@ import static org.mockito.ArgumentMatchers.anyString;
  * @see FunctionalInterface
  */
 public class KafkaTemplateSystem<KEY, VALUE> {
+    private Consumer<VALUE> consumer;
+
     public static KafkaTemplate<String, Metrics> createMetricKafkaTemplate() {
         KafkaTemplateSystem<String, Metrics> kafkaTemplateSystem = new KafkaTemplateSystem<>();
         return kafkaTemplateSystem.createKafkaTemplate(kafkaTemplateSystem.defaultKafkaSend);
@@ -39,6 +42,12 @@ public class KafkaTemplateSystem<KEY, VALUE> {
 
     public static KafkaTemplate<String, MetricsRetry> createMetricRetryKafkaTemplate() {
         KafkaTemplateSystem<String, MetricsRetry> kafkaTemplateSystem = new KafkaTemplateSystem<>();
+        return kafkaTemplateSystem.createKafkaTemplate(kafkaTemplateSystem.defaultKafkaSend);
+    }
+
+    public static KafkaTemplate<String, MetricsRetry> createMetricRetryKafkaTemplate(Consumer<MetricsRetry> consumer) {
+        KafkaTemplateSystem<String, MetricsRetry> kafkaTemplateSystem = new KafkaTemplateSystem<>();
+        kafkaTemplateSystem.consumer = consumer;
         return kafkaTemplateSystem.createKafkaTemplate(kafkaTemplateSystem.defaultKafkaSend);
     }
 
@@ -63,6 +72,9 @@ public class KafkaTemplateSystem<KEY, VALUE> {
     private ThrowableKafkaTemplateFunction<KEY, VALUE> defaultKafkaSend = (invocationOnMock -> {
         VALUE metrics = invocationOnMock.getArgument(1);
         String topic = invocationOnMock.getArgument(0);
+        if(consumer != null) {
+            consumer.accept(metrics);
+        }
         SettableListenableFuture<SendResult<KEY, VALUE>> future = new SettableListenableFuture<>();
         future.set(new SendResult<KEY, VALUE>(new ProducerRecord<>(topic, metrics), null));
         return future;
