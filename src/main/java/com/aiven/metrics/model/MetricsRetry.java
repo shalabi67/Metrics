@@ -11,6 +11,7 @@ import lombok.Data;
 public class MetricsRetry {
     private int retryCount;
     private Metrics metrics;
+    public MetricsRetry() {
 
-
+    }
 }

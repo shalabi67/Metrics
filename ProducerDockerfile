@@ -1,14 +1,22 @@
+#getting some code from: https://www.callicoder.com/spring-boot-mysql-react-docker-compose-example/
 # build producer
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jdk-alpine as build
 WORKDIR /build
+#copy maven
 COPY mvnw .
 COPY .mvn .mvn
+
+#copy source code
 COPY pom.xml .
 COPY src src
+
+#package solution
 RUN ./mvnw package -DskipTests
+RUN cp target/*.jar producer.jar
 
 # application container
 FROM openjdk:8-jre-alpine
-COPY target/*.jar producer.jar
+COPY --from=build /build/producer.jar producer.jar
+#COPY target/*.jar producer.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","producer.jar"]

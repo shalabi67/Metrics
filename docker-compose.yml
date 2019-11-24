@@ -21,7 +21,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper
-      KAFKA_CREATE_TOPICS: "Metrics:1:1, MetricsRetry:1:1"
+      #KAFKA_CREATE_TOPICS: "Metrics:1:1, MetricsRetry:1:1"
 
   postgres:
     image: postgres:9.6

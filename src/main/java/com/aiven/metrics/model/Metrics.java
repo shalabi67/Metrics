@@ -15,7 +15,7 @@ import java.util.Date;
 @Data
 public class Metrics {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private Long machineId;
     private Date metricsDate;
