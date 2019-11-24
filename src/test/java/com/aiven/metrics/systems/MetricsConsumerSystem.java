@@ -14,22 +14,27 @@ public class MetricsConsumerSystem {
     private static final int RETRY_COUNT = 3;
     private MetricsConsumer metricsConsumer;
     private MetricsRepositorySystem metricsRepositorySystem;
-    private KafkaTemplate kafkaTemplate = KafkaTemplateSystem.createMetricRetryKafkaTemplate();
+    private KafkaTemplate kafkaTemplate;
 
     public static MetricsConsumerSystem create() {
-        return create(MetricsRepositorySystem.createMetricsRepositorySystem(), null);
+        return create(MetricsRepositorySystem.createMetricsRepositorySystem(), null, null);
     }
 
     public static MetricsConsumerSystem createWithRetry() {
-        return create(MetricsRepositorySystem.createThrowingMetricsRepositorySystem(), null);
+        return create(
+                MetricsRepositorySystem.createThrowingMetricsRepositorySystem(),
+                null,
+                KafkaTemplateSystem.createMetricRetryKafkaTemplate());
     }
 
     private static MetricsConsumerSystem create(
             MetricsRepositorySystem metricsRepositorySystem,
-            ConsumerConfiguration consumerConfiguration) {
+            ConsumerConfiguration consumerConfiguration,
+            KafkaTemplate kafkaTemplate) {
 
         MetricsConsumerSystem metricsConsumerSystem = new MetricsConsumerSystem();
         metricsConsumerSystem.metricsRepositorySystem = metricsRepositorySystem;
+        metricsConsumerSystem.kafkaTemplate = kafkaTemplate;
 
         AsyncMetrics asyncMetrics = new AsyncMetrics(
                 metricsRepositorySystem.getMetricsRepository(),
