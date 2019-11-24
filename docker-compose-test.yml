@@ -5,17 +5,18 @@ services:
     build:
       context: ./
       dockerfile: ProducerDockerfile
-    image: metrics-producer
+    image: metrics-rest
+    container_name: metrics-system
     ports:
-      - 8080
+      - 8080:8080
     depends_on:
       - kafka
       - postgres
+
     links:
       - kafka
       - postgres
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/postgres
       SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS: kafka:9092
       SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: kafka:9092
@@ -30,6 +31,7 @@ services:
 
   kafka:
     image: wurstmeister/kafka
+    container_name: kafka-metrics
     restart: always
     ports:
       - 9092:9092
@@ -40,9 +42,10 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper
-      KAFKA_CREATE_TOPICS: "Metrics:1:1"
+      KAFKA_CREATE_TOPICS: "Metrics:1:1, MetricsRetry:1:1"
 
   postgres:
     image: postgres:9.6
+    container_name: postgres-metrics
     ports:
       - 5432:5432

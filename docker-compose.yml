@@ -10,6 +10,7 @@ services:
 
   kafka:
     image: wurstmeister/kafka
+    container_name: kafka-metrics
     restart: always
     ports:
       - 9092:9092
@@ -24,5 +25,6 @@ services:
 
   postgres:
     image: postgres:9.6
+    container_name: postgres-metrics
     ports:
       - 5432:5432

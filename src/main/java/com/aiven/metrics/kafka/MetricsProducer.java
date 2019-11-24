@@ -37,7 +37,7 @@ public class MetricsProducer {
         } catch (InterruptedException | ExecutionException e) {
             log.error(e.getMessage());
 
-            //let us retry to another topic.
+            //let us retry using retry topic.
             MetricsRetry metricsRetry = metricsRetryProducer.sendMetrics(new MetricsRetry(0, metrics));
             return metricsRetry.getMetrics();
         }

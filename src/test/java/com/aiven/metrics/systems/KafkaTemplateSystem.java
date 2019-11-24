@@ -43,7 +43,7 @@ public class KafkaTemplateSystem<KEY, VALUE> {
     }
 
     public KafkaTemplate<KEY, VALUE> createKafkaTemplate(
-            ThrowableFunction<KEY, VALUE> function) {
+            ThrowableKafkaTemplateFunction<KEY, VALUE> function) {
         KafkaTemplate<KEY, VALUE> kafkaTemplate = (KafkaTemplate<KEY, VALUE>) Mockito.mock(KafkaTemplate.class);
         if(kafkaTemplate == null) {
             Assertions.fail();
@@ -60,18 +60,11 @@ public class KafkaTemplateSystem<KEY, VALUE> {
         return kafkaTemplate;
     }
 
-    private ThrowableFunction<KEY, VALUE> defaultKafkaSend = (invocationOnMock -> {
+    private ThrowableKafkaTemplateFunction<KEY, VALUE> defaultKafkaSend = (invocationOnMock -> {
         VALUE metrics = invocationOnMock.getArgument(1);
         String topic = invocationOnMock.getArgument(0);
         SettableListenableFuture<SendResult<KEY, VALUE>> future = new SettableListenableFuture<>();
         future.set(new SendResult<KEY, VALUE>(new ProducerRecord<>(topic, metrics), null));
         return future;
     });
-
-    /*
-    private Function<InvocationOnMock, ListenableFuture<SendResult<KEY, VALUE>>> throwingKafkaSend = (invocationOnMock -> {
-        throw new InterruptedException();
-    });
-
-     */
 }
