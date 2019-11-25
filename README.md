@@ -7,23 +7,31 @@ This project implements a system that generates operating system metrics and pas
 - please have a look at issues. https://github.com/shalabi67/Metrics/issues
 - Through this code I did not use branches, and merge request. I thought it is irrelevant for this example.
 - Both consumers and producers are running in the same application. They could be separated.
-- I am having secure information exposed in source control. this usually will not be done like this.
+- I am having secure information exposed in source control. this usually will not be done like this. Notice how these information are hidden in docker file.
 
-## execute application
-### run locally
+## Execute application
+### Run locally
 - start containers by: docker-compose up
 - build application: mvn clean install
 - run application: java -jar target/metrics-0.0.1-SNAPSHOT.jar
 
-### run locally using docker
+### Run locally using docker
 - docker-compose -f docker-compose-test.yml build
 - docker-compose -f docker-compose-test.yml up
 
-### run production
+### Run production
+This is exposing secure information. this will be hidden through CI.
 - build application: mvn clean install
 - run application: java -jar -Dspring.profiles.active=prod target/metrics-0.0.1-SNAPSHOT.jar
 
-### send REST POST request
+### Run locally using docker
+Notice how security file are hidden through docker file build. 
+Even though password information are still exposed for simplicity but they can be hidden in environment variables.
+
+- docker-compose -f docker-compose-prod.yml build
+- docker-compose -f docker-compose-prod.yml up
+
+### Send REST POST request
 curl -X POST \
   http://localhost:8080/metrics \
   -H 'Accept: */*' \

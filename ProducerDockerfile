@@ -10,13 +10,22 @@ COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
+#copy ssl files
+COPY keystore.p12 keystore.p12
+COPY truststore.jks truststore.jks
+
 #package solution
 RUN ./mvnw package -DskipTests
 RUN cp target/*.jar producer.jar
 
 # application container
 FROM openjdk:8-jre-alpine
+#copy ssl files
+COPY --from=build /build/keystore.p12 keystore.p12
+COPY --from=build /build/truststore.jks truststore.jks
+
+#copy application file
 COPY --from=build /build/producer.jar producer.jar
-#COPY target/*.jar producer.jar
+
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","producer.jar"]
