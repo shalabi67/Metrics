@@ -1,5 +1,6 @@
 package com.aiven.metrics.metrics;
 
+import com.aiven.metrics.factory.KafkaTemplateSystemFactory;
 import com.aiven.metrics.kafka.MetricsRetryProducer;
 import com.aiven.metrics.model.Metrics;
 import com.aiven.metrics.model.MetricsRetry;
@@ -25,7 +26,7 @@ public class MetricsAddTest {
     @Test
     public void testAddMetrics() {
         //initialize test
-        KafkaTemplate<String, Metrics> kafkaTemplate = KafkaTemplateSystem.createMetricKafkaTemplate();
+        KafkaTemplate<String, Metrics> kafkaTemplate = KafkaTemplateSystemFactory.createMetricKafkaTemplate();
         MetricsSystem metricsSystem = MetricsSystem.create(kafkaTemplate, null);
 
         //run test
@@ -53,8 +54,8 @@ public class MetricsAddTest {
 
     @Test
     public void testTopicException() {
-        KafkaTemplate<String, Metrics> kafkaTemplate = KafkaTemplateSystem.createThrowingMetricKafkaTemplate();
-        KafkaTemplate<String, MetricsRetry> kafkaRetryTemplate = KafkaTemplateSystem.createMetricRetryKafkaTemplate();
+        KafkaTemplate<String, Metrics> kafkaTemplate = KafkaTemplateSystemFactory.createThrowingMetricKafkaTemplate();
+        KafkaTemplate<String, MetricsRetry> kafkaRetryTemplate = KafkaTemplateSystemFactory.createMetricRetryKafkaTemplate();
         MetricsSystem metricsSystem = MetricsSystem.create(kafkaTemplate, kafkaRetryTemplate);
 
         Long machineId = 10L;

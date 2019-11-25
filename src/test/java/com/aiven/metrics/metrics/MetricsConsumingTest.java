@@ -1,5 +1,6 @@
 package com.aiven.metrics.metrics;
 
+import com.aiven.metrics.factory.MetricsConsumerSystemFactory;
 import com.aiven.metrics.kafka.MetricsRetryProducer;
 import com.aiven.metrics.model.Metrics;
 import com.aiven.metrics.model.MetricsRetry;
@@ -20,7 +21,7 @@ class MetricsConsumingTest {
 
     @Test
     void testConsumeMetric() {
-        MetricsConsumerSystem metricsConsumerSystem = MetricsConsumerSystem.create();
+        MetricsConsumerSystem metricsConsumerSystem = MetricsConsumerSystemFactory.create();
         Metrics metrics = createMetrics(machineId);
 
         metricsConsumerSystem.consumeMetrics(metrics);
@@ -34,7 +35,7 @@ class MetricsConsumingTest {
     @Test
     void testHavingDatabaseException() {
 
-        MetricsConsumerSystem metricsConsumerSystem = MetricsConsumerSystem.createWithRetryForConsume();
+        MetricsConsumerSystem metricsConsumerSystem = MetricsConsumerSystemFactory.createWithRetryForConsume();
         Metrics metrics = createMetrics(machineId);
 
         metricsConsumerSystem.consumeMetrics(metrics);
@@ -47,7 +48,7 @@ class MetricsConsumingTest {
 
     @Test
     void testRetry() {
-        MetricsConsumerSystem metricsConsumerSystem = MetricsConsumerSystem.createWithRetryForConsume();
+        MetricsConsumerSystem metricsConsumerSystem = MetricsConsumerSystemFactory.createWithRetryForConsume();
         Metrics metrics = createMetrics(machineId);
 
         metricsConsumerSystem.consumeMetrics(metrics);

@@ -2,6 +2,8 @@ package com.aiven.metrics.systems;
 
 import com.aiven.metrics.model.Metrics;
 import com.aiven.metrics.model.MetricsRetry;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
@@ -27,29 +29,12 @@ import static org.mockito.ArgumentMatchers.anyString;
  * @see KafkaTemplate
  * @see FunctionalInterface
  */
+@Getter
+@Setter
 public class KafkaTemplateSystem<KEY, VALUE> {
     private Consumer<VALUE> consumer;
 
-    public static KafkaTemplate<String, Metrics> createMetricKafkaTemplate() {
-        KafkaTemplateSystem<String, Metrics> kafkaTemplateSystem = new KafkaTemplateSystem<>();
-        return kafkaTemplateSystem.createKafkaTemplate(kafkaTemplateSystem.defaultKafkaSend);
-    }
 
-    public static KafkaTemplate<String, Metrics> createThrowingMetricKafkaTemplate() {
-        KafkaTemplateSystem<String, Metrics> kafkaTemplateSystem = new KafkaTemplateSystem<>();
-        return kafkaTemplateSystem.createKafkaTemplate(invocationOnMock -> {throw new InterruptedException();});
-    }
-
-    public static KafkaTemplate<String, MetricsRetry> createMetricRetryKafkaTemplate() {
-        KafkaTemplateSystem<String, MetricsRetry> kafkaTemplateSystem = new KafkaTemplateSystem<>();
-        return kafkaTemplateSystem.createKafkaTemplate(kafkaTemplateSystem.defaultKafkaSend);
-    }
-
-    public static KafkaTemplate<String, MetricsRetry> createMetricRetryKafkaTemplate(Consumer<MetricsRetry> consumer) {
-        KafkaTemplateSystem<String, MetricsRetry> kafkaTemplateSystem = new KafkaTemplateSystem<>();
-        kafkaTemplateSystem.consumer = consumer;
-        return kafkaTemplateSystem.createKafkaTemplate(kafkaTemplateSystem.defaultKafkaSend);
-    }
 
     public KafkaTemplate<KEY, VALUE> createKafkaTemplate(
             ThrowableKafkaTemplateFunction<KEY, VALUE> function) {
