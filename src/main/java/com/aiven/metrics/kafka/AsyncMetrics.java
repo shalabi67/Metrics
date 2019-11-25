@@ -36,7 +36,7 @@ public class AsyncMetrics {
      * create a AsyncMetrics object. there wil be only single instance for this class.
      * @param metricsRepository a postgres repository to save Metric
      * @param consumerConfiguration a set of consumer configurations
-     * @param metricsRetryProducer
+     * @param metricsRetryProducer kafka producer to retry failed metrics.
      */
     public AsyncMetrics(
             MetricsRepository metricsRepository,
@@ -81,16 +81,17 @@ public class AsyncMetrics {
      * If the save operation failed, based into the retry count of the MetricsRetry,
      * it will send the Metrics to kafka topic using MetricsRetryProducer
      * @param metricsRetry this
-     * @return
+     * @return Retry metrics future
      */
     @Async
     public CompletableFuture<MetricsRetry> consume(MetricsRetry metricsRetry) {
-        log.info("Consuming message using thread " + Thread.currentThread().getName());
+        log.debug("Consuming message using thread " + Thread.currentThread().getName());
         if(metricsRetry == null || metricsRetry.getMetrics() == null) {
             log.error("Invalid data.");
             return CompletableFuture.completedFuture(metricsRetry);
         }
-        log.info("received metrics of machine id: " + metricsRetry.getMetrics().getMachineId());
+
+        log.debug("received metrics of machine id: " + metricsRetry.getMetrics().getMachineId());
         Metrics savedMetrics = metricsRetry.getMetrics();
         MetricsRetry newMetricsRetry = metricsRetry;
 
@@ -99,18 +100,24 @@ public class AsyncMetrics {
             savedMetrics = metricsRepository.save(savedMetrics);
             newMetricsRetry = new MetricsRetry(metricsRetry.getRetryCount(), savedMetrics);
         } catch(Exception e) {
-            log.error(e.getMessage());
-
-            if(metricsRetry.getRetryCount() < consumerConfiguration.getRetryCount()) {
-                //increment retry count and retry the operation.
-                newMetricsRetry = new MetricsRetry(
-            metricsRetry.getRetryCount() + 1,
-                      metricsRetry.getMetrics());
-                metricsRetryProducer.sendMetrics(newMetricsRetry);
-            } else {
-                //TODO: what we should do. is it ok to discard the message?
-            }
+            newMetricsRetry = retryBySendingToRetryTopic(metricsRetry, newMetricsRetry, e);
         }
         return CompletableFuture.completedFuture(newMetricsRetry);
+    }
+
+    private MetricsRetry retryBySendingToRetryTopic(MetricsRetry metricsRetry, MetricsRetry newMetricsRetry, Exception e) {
+        log.error(e.getMessage());
+
+        if(metricsRetry.getRetryCount() < consumerConfiguration.getRetryCount()) {
+            //increment retry count and retry the operation.
+             newMetricsRetry = new MetricsRetry(
+        metricsRetry.getRetryCount() + 1,
+                  metricsRetry.getMetrics());
+            metricsRetryProducer.sendMetrics(newMetricsRetry);
+        } else {
+            log.debug("Message had been dropped. Can not retry any more.");
+            //TODO: what we should do. is it ok to discard the message?
+        }
+        return newMetricsRetry;
     }
 }

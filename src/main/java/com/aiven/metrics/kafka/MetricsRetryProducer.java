@@ -27,13 +27,13 @@ public class MetricsRetryProducer {
             log.info("message ignored by  MetricsRetryProducer");
             return metricsRetry;
         }
+
         log.debug("retry metrics for machine:" + metricsRetry.getMetrics().getMachineId());
-        ListenableFuture<SendResult<String, MetricsRetry>> future = this.kafkaTemplate.send(TOPIC, metricsRetry);
         try {
+            ListenableFuture<SendResult<String, MetricsRetry>> future = this.kafkaTemplate.send(TOPIC, metricsRetry);
             SendResult<String, MetricsRetry> resultMetrics = future.get();
             return resultMetrics.getProducerRecord().value();
         } catch (InterruptedException | ExecutionException e) {
-            //retry topic has issue.
             log.error(e.getMessage());
 
             //TODO: talk with product manager to find what to do here
