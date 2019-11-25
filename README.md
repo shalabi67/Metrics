@@ -20,11 +20,11 @@ This project implements a system that generates operating system metrics and pas
 - docker-compose -f docker-compose-test.yml up
 
 ### Run production
-This is exposing secure information. this will be hidden through CI.
+This is exposing secure information. This will be hidden through CI.
 - build application: mvn clean install
 - run application: java -jar -Dspring.profiles.active=prod target/metrics-0.0.1-SNAPSHOT.jar
 
-### Run locally using docker
+### Run production using docker
 Notice how security file are hidden through docker file build. 
 Even though password information are still exposed for simplicity but they can be hidden in environment variables.
 
